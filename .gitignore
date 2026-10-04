@@ -12,3 +12,4 @@ obj/
 notes_local.txt
 temp/
 structure.txt
+config/appsettings.Development.json
