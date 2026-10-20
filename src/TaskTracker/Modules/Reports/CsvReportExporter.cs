@@ -7,7 +7,7 @@ public class CsvReportExporter
 {
     public void Export(IEnumerable<TaskItem> tasks)
     {
-        var path = @"C:\TaskTracker\reports\tasks.csv";
+        var path = @"C:\TaskTracker\reports\tasks.csv"; // Можно заменить на "reports.csv"
 
         try
         {
@@ -18,20 +18,25 @@ public class CsvReportExporter
 
             foreach (var task in tasks)
             {
-                lines.Add(string.Join(",",
-                    task.Id,
-                    task.Title,
-                    task.Status,
-                    task.Priority,
-                    task.Assignee,
+                // ИСПРАВЛЕНИЕ: Оборачиваем текстовые поля в кавычки и экранируем внутренние кавычки
+                var title = $"\"{task.Title?.Replace("\"", "\"\"")}\"";
+                var assignee = $"\"{task.Assignee?.Replace("\"", "\"\"")}\"";
+
+                lines.Add(string.Join(",", 
+                    task.Id, 
+                    title, 
+                    task.Status, 
+                    task.Priority, 
+                    assignee, 
                     task.DueDate));
             }
 
             File.WriteAllLines(path, lines, Encoding.UTF8);
             Console.WriteLine("Отчёт сохранён: " + path);
         }
-        catch
+        catch (Exception ex)
         {
+            Console.WriteLine("Ошибка экспорта: " + ex.Message);
         }
     }
 }
