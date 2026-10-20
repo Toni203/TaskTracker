@@ -1,5 +1,6 @@
 using TaskTracker.Models;
 using TaskTracker.Services;
+using TaskTracker.Modules.Reports;
 
 var storage = new TaskStorage("data/tasks.json");
 var tasks = storage.Load();
@@ -20,6 +21,7 @@ while (true)
     Console.WriteLine("5. Поиск");
     Console.WriteLine("6. Фильтр по статусу");
     Console.WriteLine("7. Фильтр по приоритету");
+    Console.WriteLine("8. Отчёты и экспорт");
     Console.WriteLine("0. Выход");
 
     Console.Write("\nВыберите действие: ");
@@ -59,6 +61,10 @@ while (true)
             FilterByPriority(taskService);
             break;
 
+        case "8":
+            new ReportMenu(taskService).Run();
+            break;
+
         case "0":
             storage.Save(taskService.GetAll());
             return;
@@ -69,6 +75,7 @@ while (true)
             break;
     }
 }
+
 static void ShowTasks(List<TaskItem> tasks)
 {
     Console.Clear();
@@ -88,8 +95,7 @@ static void ShowTasks(List<TaskItem> tasks)
         Console.WriteLine($"Исполнитель: {task.Assignee}");
         Console.WriteLine($"Приоритет: {task.Priority}");
         Console.WriteLine($"Статус: {task.Status}");
-        Console.WriteLine(
-            $"Срок: {(task.DueDate.HasValue ? task.DueDate.Value.ToShortDateString() : "не указан")}");
+        Console.WriteLine($"Срок: {(task.DueDate.HasValue ? task.DueDate.Value.ToShortDateString() : "не указан")}");
     }
 
     Pause();
@@ -129,6 +135,7 @@ static void AddTask(TaskService service)
 
     Pause();
 }
+
 static void EditTask(TaskService service)
 {
     Console.Clear();
@@ -164,9 +171,9 @@ static void EditTask(TaskService service)
         task.Assignee = assignee;
 
     Console.WriteLine("Задача изменена.");
-
     Pause();
 }
+
 static void DeleteTask(TaskService service)
 {
     Console.Clear();
@@ -187,31 +194,26 @@ static void DeleteTask(TaskService service)
 
     Pause();
 }
+
 static void SearchTasks(TaskService service)
 {
     Console.Clear();
 
     Console.Write("Введите текст поиска: ");
-
     var query = Console.ReadLine() ?? string.Empty;
-
     var result = service.Search(query);
-
     ShowTasks(result);
 }
 
 static void FilterByStatus(TaskService service)
 {
     Console.Clear();
-
     Console.WriteLine("1. New");
     Console.WriteLine("2. InProgress");
     Console.WriteLine("3. Completed");
-
     Console.Write("Выберите статус: ");
 
     var input = Console.ReadLine();
-
     var status = input switch
     {
         "1" => TaskState.New,
@@ -223,19 +225,15 @@ static void FilterByStatus(TaskService service)
     ShowTasks(service.FilterByStatus(status));
 }
 
-
 static void FilterByPriority(TaskService service)
 {
     Console.Clear();
-
     Console.WriteLine("1. Low");
     Console.WriteLine("2. Medium");
     Console.WriteLine("3. High");
-
     Console.Write("Выберите приоритет: ");
 
     var input = Console.ReadLine();
-
     var priority = input switch
     {
         "1" => TaskPriority.Low,
